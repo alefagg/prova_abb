@@ -1,0 +1,206 @@
+#include <ros/ros.h>
+#include <actionlib/client/simple_action_client.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
+#include <sensor_msgs/JointState.h>
+#include <tf/tf.h>
+#include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit/planning_interface/planning_interface.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
+#include <moveit_msgs/DisplayRobotState.h>
+#include <moveit_msgs/DisplayTrajectory.h>
+#include "moveit_msgs/Grasp.h"
+#include <moveit/robot_model_loader/robot_model_loader.h>
+#include <moveit/robot_state/robot_state.h>
+#include <sensor_msgs/JointState.h>
+
+#include "std_msgs/String.h"
+#include "std_srvs/Trigger.h"
+#include "centauro_grasp_server/GraspServerGrasp.h"
+
+std::string gripper_follow_joint_server = "/simple_gripper/joint_trajectory_controller/follow_joint_trajectory";
+
+bool received = false;
+double joint_position;
+tf::TransformListener* listener;
+
+
+void jointCallback(const sensor_msgs::JointState::ConstPtr& msg)
+{
+  joint_position = msg->position[6];
+}
+
+bool start_grasp(centauro_grasp_server::GraspServerGrasp::Request  &req, centauro_grasp_server::GraspServerGrasp::Response &res){
+
+
+  return true;
+}
+
+
+int main(int argc, char **argv)
+{
+	
+
+	ros::init(argc, argv, "centauro_grasp_server");
+	ros::NodeHandle n;
+	ros::NodeHandle n1;
+	ros::ServiceServer service = n1.advertiseService("start_grasp_server", start_grasp);
+
+	tf::TransformListener* listener = new tf::TransformListener();
+
+	moveit_msgs::Grasp grasp_msg;
+
+	/******************************************/
+	/****** PRE GRASP POSTURE *****************/
+	/******************************************/
+		
+
+	// create the action client
+  	// true causes the client to spin its own thread
+  	actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> ac(gripper_follow_joint_server, true);
+	ROS_INFO("Waiting for action server to start.");
+	// wait for the action server to start
+	ac.waitForServer(); //will wait for infinite time
+
+	ROS_INFO("Action server started, sending goal.");
+	// send a goal to the action
+	control_msgs::FollowJointTrajectoryGoal gripper_trajectory_goal;
+	gripper_trajectory_goal.trajectory = grasp_msg.pre_grasp_posture;
+
+	control_msgs::JointTolerance tolerance;
+	tolerance.name = "simple_gripper_right_driver_joint";
+	tolerance.position = 0.1;
+
+	gripper_trajectory_goal.path_tolerance.push_back(tolerance);	
+	gripper_trajectory_goal.goal_tolerance.push_back(tolerance);	
+	
+	gripper_trajectory_goal.goal_time_tolerance = ros::Duration(20.0);
+
+	ac.sendGoal(gripper_trajectory_goal);
+
+	//wait for the action to return
+	bool finished_before_timeout = ac.waitForResult(ros::Duration(60.0));
+
+  	if (finished_before_timeout)
+	{
+		actionlib::SimpleClientGoalState state = ac.getState();
+	    	ROS_INFO("Action finished: %s",state.toString().c_str());
+	}
+	else
+		ROS_INFO("Action did not finish before the time out.");
+
+	
+	/************************************************************/
+	/********* GRASP POSE ***************************************/
+	/************************************************************/
+
+	geometry_msgs::PoseStamped grasp_pose = grasp_msg.grasp_pose;
+	//move (translate) grasp_pose along z axis of its orientation;
+	tf::Quaternion grasp_tf_quat;
+	tf::quaternionMsgToTF(grasp_msg.grasp_pose.pose.orientation, grasp_quat);
+	tf::Vector3 grasp_tf_vector = tf::Vector3(grasp_msg.grasp_pose.pose.position.x,
+						grasp_msg.grasp_pose.pose.position.y,
+						grasp_msg.grasp_pose.pose.position.z);
+	tf::Transform grasp_tf(grasp_quat, grasp_tf_vector);
+	tf::StampedTransform grasp_tf_stamped(grasp_tf, grasp_msg.grasp_pose.header.stamp, grasp_msg.grasp_pose.header.frame_id, "grasp_tf");
+	listener->setTransform(grasp_tf_stamped);
+	std::string original_frame = grasp_msg.grasp_pose.header.frame_id;
+
+	ROS_INFO("grasp pose ");
+        ROS_INFO("%f %f %f ", grasp_msg.grasp_pose.pose.position.x, 
+				grasp_msg.grasp_pose.pose.position.y,
+				grasp_msg.grasp_pose.pose.position.z);
+        ROS_INFO("%f %f %f %f", grasp_msg.grasp_pose.pose.orientation.x,
+				grasp_msg.grasp_pose.pose.orientation.y,
+				grasp_msg.grasp_pose.pose.orientation.z,
+				grasp_msg.grasp_pose.pose.orientation.w);
+
+      	listener->transformPose("grasp_tf", grasp_msg.grasp_pose, grasp_msg.grasp_pose);
+	grasp_msg.grasp_pose.pose.position.z = -grasp_msg.pre_grasp_approach.desired_distance;
+        listener->transformPose(original_frame, grasp_msg.grasp_pose, grasp_msg.grasp_pose);
+	ROS_INFO("new grasp pose ");
+        ROS_INFO("%f %f %f ", grasp_msg.grasp_pose.pose.position.x, 
+				grasp_msg.grasp_pose.pose.position.y,
+				grasp_msg.grasp_pose.pose.position.z);
+        ROS_INFO("%f %f %f %f", grasp_msg.grasp_pose.pose.orientation.x,
+				grasp_msg.grasp_pose.pose.orientation.y,
+				grasp_msg.grasp_pose.pose.orientation.z,
+				grasp_msg.grasp_pose.pose.orientation.w);
+
+	//this part ask for the service which move the arm to a point
+  	ros::ServiceClient pose_client = n.serviceClient<centauro_ur5_moveit_client::GraspPoseStamped>("/ur5_pose_goal");
+	centauro_ur5_moveit_client::GraspPoseStamped pose_srv;
+	pose_srv.request.pose = grasp_msg.grasp_pose;
+	if (pose_client.call(pose_srv))
+	{
+		ROS_INFO("Success: %d", (int)pose_srv.response.success);
+	}
+	else
+	{
+		ROS_ERROR("Failed to call service /ur5_pose_goal");
+		return 1;
+  	}
+
+	/*************************************************************/
+	/********* GRIPPER TRANSLATION *******************************/
+	/************************************************************/
+	//Move cartesian
+        ros::ServiceClient distance_client = n.serviceClient<centauro_ur5_moveit_client::MoveCartesian>("/ur5_move_cartesian");
+	centauro_ur5_moveit_client::MoveCartesian distance_srv;
+        distance_srv.request.z = grasp_msg.pre_grasp_approach.desired_distance;
+	distance_srv.request.use_end_effector_link = true;
+        if (distance_client.call(distance_srv))
+        {
+                ROS_INFO("Success: %d", (int)distance_srv.response.success);
+        }
+        else
+        {
+                ROS_ERROR("Failed to call service /ur5_move_cartesian");
+                return 1;
+        }
+
+	/*************************************************************/
+        /********* GRASP POSTURE ************************************/
+        /************************************************************/
+        grasp_msg.grasp_posture.header.stamp = ros::Time::now() + ros::Duration(1.0);
+
+	gripper_trajectory_goal.trajectory = grasp_msg.grasp_posture;
+	
+	ac.sendGoal(gripper_trajectory_goal);
+
+        //wait for the action to return
+        finished_before_timeout = ac.waitForResult(ros::Duration(60.0));
+
+        if (finished_before_timeout)
+        {
+                actionlib::SimpleClientGoalState state = ac.getState();
+                ROS_INFO("Action finished: %s",state.toString().c_str());
+        }
+        else
+                ROS_INFO("Action did not finish before the time out.");
+
+        /*************************************************************/
+        /********* GRIPPER TRANSLATION *******************************/
+        /************************************************************/
+
+        distance_srv.request.z = -grasp_msg.pre_grasp_approach.desired_distance;
+        distance_srv.request.use_end_effector_link = true;
+        if (distance_client.call(distance_srv))
+        {
+                ROS_INFO("Success: %d", (int)distance_srv.response.success);
+        }
+        else
+        {
+                ROS_ERROR("Failed to call service /ur5_move_cartesian");
+                return 1;
+        }
+
+
+	ros::spin();
+	//exit
+	return 0;
+
+}

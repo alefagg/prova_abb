@@ -1,0 +1,110 @@
+#include <ros/ros.h>
+#include <tf/tf.h>
+#include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
+
+#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit/trajectory_processing/iterative_time_parameterization.h>
+#include <moveit_msgs/DisplayRobotState.h>
+#include <moveit_msgs/DisplayTrajectory.h>
+#include "moveit_msgs/Grasp.h"
+#include <sensor_msgs/JointState.h>
+#include <moveit/planning_interface/planning_interface.h>
+#include <actionlib/client/simple_action_client.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
+#include "std_msgs/String.h"
+#include "std_srvs/Trigger.h"
+
+#include <moveit/robot_model_loader/robot_model_loader.h>
+#include <moveit/robot_state/robot_state.h>
+#include "centauro_grasp_server/GraspServerGrasp.h"
+using namespace std;
+
+moveit::planning_interface::MoveGroupInterface* group;
+tf::TransformListener* listener;
+moveit_msgs::Grasp grasp_msg;
+double joint_position;
+ros::ServiceClient client;
+
+void grasp_msg_grip(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+	centauro_grasp_server::GraspServerGrasp srv;
+	geometry_msgs::PoseStamped m_pose=*msg;
+	//cout << "Founded pose"<< endl << m_pose <<endl << endl <<endl;
+
+        bool tf_success = false;
+        while(!tf_success)
+        {
+          tf_success = listener->waitForTransform(m_pose.header.frame_id, group->getPlanningFrame(), ros::Time::now(), ros::Duration(1.0));
+        }
+	ROS_INFO("found tf");
+	listener->transformPose(group->getPlanningFrame(), m_pose,  m_pose);
+	//cout << "Trasformed pose"<< endl << m_pose <<endl << endl <<endl;
+
+	grasp_msg.id = "grip";
+	//convert m to joint 
+	// 140mm = 0 ----- 0mm = 1
+	//120 mm = 1/140 * (140 - 120) = 0.14285714285
+	//40 mm = 1/140 * (140 - 40) = 0.71428571428
+	//grasp_msg.pre_grasp_posture;
+	grasp_msg.pre_grasp_posture.header.stamp = ros::Time::now() + ros::Duration(1.0);
+        grasp_msg.pre_grasp_posture.joint_names.push_back("simple_gripper_right_driver_joint");
+        trajectory_msgs::JointTrajectoryPoint starting_point;
+
+        starting_point.positions.push_back(0.0);
+        starting_point.time_from_start = ros::Duration(1.0);
+        grasp_msg.pre_grasp_posture.points.push_back(starting_point);
+
+        trajectory_msgs::JointTrajectoryPoint ending_point;
+        ending_point.positions.push_back(0.14285714285);
+        ending_point.time_from_start = ros::Duration(2.0);
+        grasp_msg.pre_grasp_posture.points.push_back(ending_point);
+
+
+        grasp_msg.grasp_posture.header.stamp = ros::Time::now() + ros::Duration(1.0);
+        grasp_msg.grasp_posture.joint_names.push_back("simple_gripper_right_driver_joint");
+        starting_point.positions.pop_back();
+        starting_point.positions.push_back(0.14285714285);
+        starting_point.time_from_start = ros::Duration(1.0);
+        grasp_msg.grasp_posture.points.push_back(starting_point);
+
+        ending_point.positions.pop_back();
+        ending_point.positions.push_back(0.71428571428);
+        ending_point.time_from_start = ros::Duration(2.0);
+        grasp_msg.grasp_posture.points.push_back(ending_point);
+	
+	grasp_msg.grasp_pose=m_pose;
+	grasp_msg.pre_grasp_approach.desired_distance = 0.17; //lenght of hand
+	//cout << "grasped pose"<< endl << grasp_msg.grasp_pose <<endl << endl <<endl;
+	srv.request.pose=grasp_msg;
+	ROS_INFO("Waiting for server response");
+
+	if(client.call(srv)){
+		
+    		if(srv.response.success) ROS_INFO("Action successfull");
+		else ROS_ERROR("Action Failed");
+		return;
+  	}
+  	else{
+    		ROS_ERROR("Failed to call service start_grasp_server");
+    		return;
+  	}
+}
+
+int main(int argc, char **argv)
+{
+  
+  ros::init(argc, argv, "centauro_grasp_bridge");
+  ros::NodeHandle n;
+  ros::NodeHandle n2;
+  ros::NodeHandle n3;
+  group = new moveit::planning_interface::MoveGroupInterface("arm");
+  listener = new tf::TransformListener();
+  client = n3.serviceClient<centauro_grasp_server::GraspServerGrasp>("start_grasp_server");
+  ros::Subscriber sub1 = n.subscribe("aruco_marker_7", 1, grasp_msg_grip);
+  //ros::Subscriber sub2 = n2.subscribe("aruco_marker_frame_5", 1, grasp_msg_suction);
+  ros::spin();
+
+  return 0;
+}
