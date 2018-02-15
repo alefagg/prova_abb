@@ -1,4 +1,3 @@
-// insert copyright 
 
 #include <string>
 #include <iostream>
