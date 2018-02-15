@@ -1,3 +1,5 @@
+// insert copyright 
+
 #include <string>
 #include <iostream>
 #include <cstdio>
