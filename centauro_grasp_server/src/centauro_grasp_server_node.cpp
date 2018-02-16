@@ -1,6 +1,3 @@
-// 2018 Copyright ABB, Power-One Italy S.p.A, all rights reserved 
-// insert copyright 
-
 
 #include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
