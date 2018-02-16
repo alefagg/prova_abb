@@ -1,3 +1,4 @@
+// 2018 Copyright ABB, Power-One Italy S.p.A, all rights reserved 
 
 #include <ros/ros.h>
 #include <tf/tf.h>
