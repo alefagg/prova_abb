@@ -1,4 +1,3 @@
-// 2018 Copyright ABB, Power-One Italy S.p.A, all rights reserved 
 
 #include <string>
 #include <iostream>
