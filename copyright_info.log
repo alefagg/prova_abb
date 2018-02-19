@@ -1,21 +1,29 @@
 INFO log data File for repository /home/ale/prova_abb/ 
- 2018-02-19 13:25:43,484 - __main__ - INFO - 	 Insert Copyright Process initialized 
+ 2018-02-19 13:50:55,939 - __main__ - INFO - Repository directory already present
+2018-02-19 13:50:55,939 - __main__ - INFO - Sending command: pull
+2018-02-19 13:50:56,699 - __main__ - INFO - Already up-to-date.
 
-2018-02-19 13:25:43,486 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/centauro_grasp_server/src/centauro_grasp_bridge.cpp
-2018-02-19 13:25:43,486 - __main__ - INFO - Searching inside the file...
-2018-02-19 13:25:43,493 - __main__ - INFO - last commit of the file: 2018
-2018-02-19 13:25:43,494 - __main__ - INFO - Copyright senteces found
-2018-02-19 13:25:43,494 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/centauro_grasp_server/src/centauro_grasp_server_node.cpp
-2018-02-19 13:25:43,494 - __main__ - INFO - Searching inside the file...
-2018-02-19 13:25:43,502 - __main__ - INFO - last commit of the file: 2018
-2018-02-19 13:25:43,503 - __main__ - INFO - Copyright senteces found
-2018-02-19 13:25:43,504 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/vel_usb_control/src/usb_control.cpp
-2018-02-19 13:25:43,504 - __main__ - INFO - Searching inside the file...
-2018-02-19 13:25:43,507 - __main__ - INFO - last commit of the file: 2018
-2018-02-19 13:25:43,508 - __main__ - INFO - Copyright senteces found
-2018-02-19 13:25:43,508 - __main__ - INFO - 	 Starting updating process 
+2018-02-19 13:50:56,700 - __main__ - INFO - Controlling for staged files
+2018-02-19 13:50:56,705 - __main__ - INFO - File Staged: 
 
-2018-02-19 13:25:43,509 - __main__ - INFO - Sending command: pull
-2018-02-19 13:25:44,303 - __main__ - INFO - Already up-to-date.
+2018-02-19 13:50:56,706 - __main__ - INFO - copyright_info.log
+2018-02-19 13:50:56,707 - __main__ - INFO - 	 INSERT COPYRIGHT PROCESS INITIALIZED
 
-2018-02-19 13:25:44,303 - __main__ - INFO - Nothing to add
+2018-02-19 13:50:56,709 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/centauro_grasp_server/src/centauro_grasp_bridge.cpp
+2018-02-19 13:50:56,709 - __main__ - INFO - Searching inside the file...
+2018-02-19 13:50:56,716 - __main__ - INFO - last commit of the file: 2018
+2018-02-19 13:50:56,717 - __main__ - INFO - Copyright senteces found
+2018-02-19 13:50:56,717 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/centauro_grasp_server/src/centauro_grasp_server_node.cpp
+2018-02-19 13:50:56,717 - __main__ - INFO - Searching inside the file...
+2018-02-19 13:50:56,725 - __main__ - INFO - last commit of the file: 2018
+2018-02-19 13:50:56,725 - __main__ - INFO - Copyright senteces found
+2018-02-19 13:50:56,726 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/vel_usb_control/src/usb_control.cpp
+2018-02-19 13:50:56,726 - __main__ - INFO - Searching inside the file...
+2018-02-19 13:50:56,732 - __main__ - INFO - last commit of the file: 2018
+2018-02-19 13:50:56,732 - __main__ - INFO - Copyright senteces found
+2018-02-19 13:50:56,733 - __main__ - INFO - 	 STARTING UPDATE PROCESS 
+
+2018-02-19 13:50:56,733 - __main__ - INFO - Sending command: pull
+2018-02-19 13:50:57,571 - __main__ - INFO - Already up-to-date.
+
+2018-02-19 13:50:57,572 - __main__ - INFO - Nothing to add
