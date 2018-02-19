@@ -1,29 +1,50 @@
 INFO log data File for repository /home/ale/prova_abb/ 
- 2018-02-19 13:50:55,939 - __main__ - INFO - Repository directory already present
-2018-02-19 13:50:55,939 - __main__ - INFO - Sending command: pull
-2018-02-19 13:50:56,699 - __main__ - INFO - Already up-to-date.
+ 2018-02-19 14:32:41,042 - incop - INFO - Repository directory already present
+2018-02-19 14:32:41,042 - incop - INFO - Sending command: pull
+2018-02-19 14:32:42,159 - command_repo - INFO - Already up-to-date.
 
-2018-02-19 13:50:56,700 - __main__ - INFO - Controlling for staged files
-2018-02-19 13:50:56,705 - __main__ - INFO - File Staged: 
+2018-02-19 14:32:42,160 - check_if_staged - INFO - Controlling for staged files
+2018-02-19 14:32:42,167 - check_if_staged - INFO - File Staged: 
 
-2018-02-19 13:50:56,706 - __main__ - INFO - copyright_info.log
-2018-02-19 13:50:56,707 - __main__ - INFO - 	 INSERT COPYRIGHT PROCESS INITIALIZED
+2018-02-19 14:32:42,168 - check_if_staged - INFO - centauro_grasp_server/src/centauro_grasp_server_node.cpp
+2018-02-19 14:32:42,168 - check_if_staged - INFO - copyright_info.log
+2018-02-19 14:32:42,169 - insert_copyright - INFO - 	 INSERT COPYRIGHT PROCESS INITIALIZED
 
-2018-02-19 13:50:56,709 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/centauro_grasp_server/src/centauro_grasp_bridge.cpp
-2018-02-19 13:50:56,709 - __main__ - INFO - Searching inside the file...
-2018-02-19 13:50:56,716 - __main__ - INFO - last commit of the file: 2018
-2018-02-19 13:50:56,717 - __main__ - INFO - Copyright senteces found
-2018-02-19 13:50:56,717 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/centauro_grasp_server/src/centauro_grasp_server_node.cpp
-2018-02-19 13:50:56,717 - __main__ - INFO - Searching inside the file...
-2018-02-19 13:50:56,725 - __main__ - INFO - last commit of the file: 2018
-2018-02-19 13:50:56,725 - __main__ - INFO - Copyright senteces found
-2018-02-19 13:50:56,726 - __main__ - INFO - Found .cpp file in: /home/ale/prova_abb/vel_usb_control/src/usb_control.cpp
-2018-02-19 13:50:56,726 - __main__ - INFO - Searching inside the file...
-2018-02-19 13:50:56,732 - __main__ - INFO - last commit of the file: 2018
-2018-02-19 13:50:56,732 - __main__ - INFO - Copyright senteces found
-2018-02-19 13:50:56,733 - __main__ - INFO - 	 STARTING UPDATE PROCESS 
+2018-02-19 14:32:42,172 - insert_copyright - INFO - Found .cpp file in: /home/ale/prova_abb/centauro_grasp_server/src/centauro_grasp_bridge.cpp
+2018-02-19 14:32:42,173 - insert_copyright - INFO - Searching inside the file...
+2018-02-19 14:32:42,177 - insert_copyright - INFO - last commit of the file: 2018
+2018-02-19 14:32:42,177 - insert_copyright - INFO - Copyright senteces found
+2018-02-19 14:32:42,177 - insert_copyright - INFO - Found .cpp file in: /home/ale/prova_abb/centauro_grasp_server/src/centauro_grasp_server_node.cpp
+2018-02-19 14:32:42,177 - insert_copyright - INFO - Searching inside the file...
+2018-02-19 14:32:42,185 - insert_copyright - INFO - last commit of the file: 2018
+2018-02-19 14:32:42,186 - insert_copyright - INFO - Copyright senteces found
+2018-02-19 14:32:42,187 - insert_copyright - INFO - Found .cpp file in: /home/ale/prova_abb/vel_usb_control/src/usb_control.cpp
+2018-02-19 14:32:42,187 - insert_copyright - INFO - Searching inside the file...
+2018-02-19 14:32:42,193 - insert_copyright - INFO - last commit of the file: 2018
+2018-02-19 14:32:42,193 - insert_copyright - INFO - Copyright senteces found
+2018-02-19 14:32:42,194 - incop - INFO - 	 STARTING UPDATE PROCESS 
 
-2018-02-19 13:50:56,733 - __main__ - INFO - Sending command: pull
-2018-02-19 13:50:57,571 - __main__ - INFO - Already up-to-date.
+2018-02-19 14:32:42,194 - incop - INFO - Sending command: pull
+2018-02-19 14:32:43,104 - command_repo - INFO - Already up-to-date.
 
-2018-02-19 13:50:57,572 - __main__ - INFO - Nothing to add
+2018-02-19 14:32:43,105 - update_repo - INFO - Found files to add
+2018-02-19 14:32:43,105 - incop - INFO - Sending command: add
+2018-02-19 14:32:43,105 - command_repo - INFO - File to add centauro_grasp_server/src/centauro_grasp_server_node.cpp
+2018-02-19 14:32:43,112 - command_repo - INFO - 
+2018-02-19 14:32:43,113 - incop - INFO - Sending command: status
+2018-02-19 14:32:43,121 - command_repo - INFO - On branch master
+Your branch is up-to-date with 'origin/master'.
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   centauro_grasp_server/src/centauro_grasp_server_node.cpp
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   copyright_info.log
+
+
+2018-02-19 14:32:43,121 - incop - INFO - Sending command: push
+2018-02-19 14:32:53,647 - command_repo - INFO - 
